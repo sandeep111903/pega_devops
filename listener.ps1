@@ -1,5 +1,12 @@
-$FTBM = 'C:\Users\rajxe\OneDrive\Desktop\listener\pega_root'
+
+
+$FTBM = '.\pega_root'
 $FLTR = '*.*'
+
+Unregister-Event FileDeletion
+Unregister-Event FileChange
+Unregister-Event FileCreated
+
 
 $watcher = New-Object IO.FileSystemWatcher $FTBM, $FLTR -property @{IncludeSubDirectories = $false; NotifyFilter = [IO.NotifyFilters]'FileName, LastWrite'}
 
@@ -9,6 +16,7 @@ $changeType = $Event.SourceEventArgs.ChangeType
 $timeStamp = $Event.TimeGenerated
 Write-Host "This file: $name, was $changeType at $timeStamp!"
 Out-File -filepath 'C:\Users\rajxe\OneDrive\Desktop\listener\changeLogs.txt' -append -inputobject "This file: $name, was $changeType at $timeStamp!"
+& ".\pusher.ps1"
 }
 
 Register-ObjectEvent $watcher Deleted -SourceIdentifier FileDeletion -Action {
@@ -27,6 +35,3 @@ Write-Host "This file: $name, was $changeType at $timeStamp!"
 Out-File -filepath 'C:\Users\rajxe\OneDrive\Desktop\listener\changeLogs.txt' -append -inputobject "This file: $name, was $changeType at $timeStamp!"
 }
 
-# Unregister-Event FileDeletion
-# Unregister-Event FileChange
-# Unregister-Event FileCreated
